@@ -1,3 +1,5 @@
+这是一个封装redux的demo
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
