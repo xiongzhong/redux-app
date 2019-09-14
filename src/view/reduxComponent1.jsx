@@ -17,7 +17,7 @@ class ReduxComponent1 extends Component {
     }
     // 在渲染前调用
     UNSAFE_componentWillMount() {
-        console.log('实例挂载前',1)
+
     }
     // 在第一次渲染后调用，只在客户端。 之后组件已经生成了对应的DOM结构，
     // 可以通过this.getDOMNode()来进行访问。

@@ -6,9 +6,8 @@ const createStore = function (reducer, initState) {
         listeners.push(listener)
     }
 
-    function changeCount(action) {
+    function dispatch(action) {
         /*当状态改变的时候，我们要去通知所有的订阅者*/
-
         state = reducer(state, action);
         for (let i = 0; i < listeners.length; i++) {
             const listener = listeners[i];
@@ -19,10 +18,13 @@ const createStore = function (reducer, initState) {
     function getState() {
         return state;
     }
+    dispatch({
+        type: Symbol()
+    });
     return {
         getState,
         subscribe,
-        changeCount
+        dispatch
     }
 };
 

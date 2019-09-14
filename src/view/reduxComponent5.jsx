@@ -1,23 +1,15 @@
 import React, {Component} from 'react';
-import createStore from "../redux/demo04";
-import combineReducers from '../redux/demo04/combine'
-import {counterReducer, personReducer} from '../redux/demo04/type'
-let state = {
-    counter: {
-        count: 0
-    },
+import createStore from "../redux/demo05";
+import combineReducers from '../redux/demo05/combine'
+import counterReducer from '../redux/demo05/countType'
+import personReducer from '../redux/demo05/personType'
 
-    person: {
-        name: 'xiao ming',
-        age: 12
-    }
-};
 // 合并不同状态定义的操作类型
 const reducer = combineReducers({
     counter: counterReducer,
     person: personReducer
 });
-let {getState, subscribe, changeCount} = createStore(reducer, state);
+let {getState, subscribe, dispatch} = createStore(reducer);
 
 class ReduxComponent1 extends Component {
     constructor(props) {
@@ -27,12 +19,12 @@ class ReduxComponent1 extends Component {
     render() {
         return (
             <div>
-                <h2>4、合并多个状态</h2>
+                <h2>5、拆分state</h2>
                 <button onClick={ReduxComponent1.handleClick.bind(this, 1)}>加1</button>
                 <button onClick={ReduxComponent1.handleClick.bind(this, 2)}>减1</button>
                 <h3>count:{this.state.counter.count}</h3>
-                <input type="text" placeholder="请输入姓名" name="" id="" onInput={this.handleName}/>
-                <input type="number" placeholder="请输入年龄" name="" id="" onInput={this.handleAge}/>
+                <input type="text" placeholder="请输入姓名" defaultValue={this.state.person.name} id="" onInput={this.handleName}/>
+                <input type="number" placeholder="请输入年龄" defaultValue={this.state.person.age} id="" onInput={this.handleAge}/>
                 <ol>
                     <li>姓名：{this.state.person.name}</li>
                     <li>年龄: {this.state.person.age}</li>
@@ -42,24 +34,24 @@ class ReduxComponent1 extends Component {
     }
     static handleClick(type){
         if(type === 1) {
-            changeCount({
+            dispatch({
                 type: 'INCREASE'
             });
         } else {
-            changeCount({
+            dispatch({
                 type: 'SUBTRACT'
             });
         }
 
     }
     handleName = (e) => {
-        changeCount({
+        dispatch({
             type: 'SET_NAME',
             name: e.target.value
         });
     }
     handleAge = (e) => {
-        changeCount({
+        dispatch({
             type: 'SET_AGE',
             age: e.target.value
         });
