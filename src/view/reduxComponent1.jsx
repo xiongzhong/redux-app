@@ -10,7 +10,8 @@ class ReduxComponent1 extends Component {
     render() {
         return (
             <div>
-                <h1>count:{this.state.count}</h1>
+                <h2>1、实现简单的发布和订阅</h2>
+                <h3>count:{this.state.count}</h3>
             </div>
         );
     }

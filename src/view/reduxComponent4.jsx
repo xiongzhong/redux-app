@@ -1,10 +1,43 @@
 import React, {Component} from 'react';
 import createStore from "../redux/demo03";
 let state = {
-    count: 0
+    counter: {
+        count: 0
+    },
+
+    person: {
+        name: 'xiao ming',
+        age: 12
+    }
 };
-let {getState, subscribe, changeCount} = createStore(plan, state);
-function plan(state, action) {
+// 合并不同状态定义的操作类型
+const reducer = combineReducers({
+    counter: counterReducer,
+    person: personReducer
+});
+let {getState, subscribe, changeCount} = createStore(reducer, state);
+
+/**
+ *
+ * @param reducers
+ * @returns {function(*=, *=)}
+ */
+function combineReducers(reducers) {
+    let reducerKeys = Object.keys(reducers);
+    let initState = {};
+    // 利用闭包返回combination函数在changeCount中执行闭包中的函数返回新的状态
+    return function combination(state = {}, action) {
+        reducerKeys.forEach(key => {
+            let reducer = reducers[key]; // 获取定义的操作类型函数
+            let oldState = state[key]; // 获取旧状态中的值应状态
+            // 执行函数后获取该状态更新后的值
+            initState[key] = reducer(oldState, action);
+        });
+        // 保存后返回新的状态
+        return initState;
+    }
+}
+function counterReducer(state, action) {
     switch (action.type) {
         case 'INCREASE':
             return {
@@ -23,8 +56,26 @@ function plan(state, action) {
             }
     }
 }
+function personReducer(state, action) {
+    switch (action.type) {
+        case 'SET_NAME':
+            return {
+                ...state,
+                name: action.name
+            };
+        case 'SET_AGE': {
+            return {
+                ...state,
+                age: action.age
+            }
+        }
+        default:
+            return {
+                ...state
+            }
+    }
+}
 
-createStore(plan, state);
 class ReduxComponent1 extends Component {
     constructor(props) {
         super(props);
@@ -33,11 +84,16 @@ class ReduxComponent1 extends Component {
     render() {
         return (
             <div>
-                <h2>3、通过指定类型更新状态，防止非法更新状态</h2>
+                <h2>4、合并多个状态</h2>
                 <button onClick={ReduxComponent1.handleClick.bind(this, 1)}>加1</button>
                 <button onClick={ReduxComponent1.handleClick.bind(this, 2)}>减1</button>
-                <button onClick={ReduxComponent1.handleClick.bind(this, 3)}>将count该为abc</button>
-                <h3>count:{this.state.count}</h3>
+                <h3>count:{this.state.counter.count}</h3>
+                <input type="text" placeholder="请输入姓名" name="" id="" onInput={this.handleName}/>
+                <input type="number" placeholder="请输入年龄" name="" id="" onInput={this.handleAge}/>
+                <ol>
+                    <li>姓名：{this.state.person.name}</li>
+                    <li>年龄: {this.state.person.age}</li>
+                </ol>
             </div>
         );
     }
@@ -46,16 +102,24 @@ class ReduxComponent1 extends Component {
             changeCount({
                 type: 'INCREASE'
             });
-        } else if(type === 2) {
+        } else {
             changeCount({
                 type: 'SUBTRACT'
             });
-        } else {
-            changeCount({
-                count: 'abc'
-            });
         }
 
+    }
+    handleName = (e) => {
+        changeCount({
+            type: 'SET_NAME',
+            name: e.target.value
+        });
+    }
+    handleAge = (e) => {
+        changeCount({
+            type: 'SET_AGE',
+            age: e.target.value
+        });
     }
     // 在渲染前调用
     UNSAFE_componentWillMount() {
@@ -67,7 +131,7 @@ class ReduxComponent1 extends Component {
         subscribe(() => {
             console.log(getState())
             this.setState({
-                count: getState().count
+                ...getState()
             })
         });
     }

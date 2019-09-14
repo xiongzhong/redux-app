@@ -17,10 +17,11 @@ class ReduxComponent1 extends Component {
     render() {
         return (
             <div>
+                <h2>2、将公共状态进行封装</h2>
                 <button onClick={this.handleClick}>更新数据</button>
-                <h1>count:{this.state.count}</h1>
+                <h3>count:{this.state.count}</h3>
 
-                <h2>姓名：{this.state.person.name}，性别：{this.state.person.sex}</h2>
+                <h3>姓名：{this.state.person.name}，性别：{this.state.person.sex}</h3>
             </div>
         );
     }
