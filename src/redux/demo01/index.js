@@ -1,24 +1,26 @@
 /*------count 的发布订阅者实践------*/
-class Store {
-    constructor(count = 1) {
-        this.state = {
-            count
-        };
-        this.listeners = [];
+const createStore = function (count = 0) {
+    let state = {
+        count
+    };
+    let listeners = [];
+    function subscribe(listener) {// 将所有订阅函数保存起来
+        listeners.push(listener)
     }
-
-    subscribe(listener) {// 将所有订阅函数保存起来
-        this.listeners.push(listener)
-    }
-    changeCount(count) {
+    function changeCount(count) {
         /*当 count 改变的时候，我们要去通知所有的订阅者*/
-        this.state.count = count;
-        for (let i = 0; i < this.listeners.length; i++) {
-            const listener = this.listeners[i];
+        state.count = count;
+        for (let i = 0; i < listeners.length; i++) {
+            const listener = listeners[i];
             listener();
         }
     }
-}
-let store = new Store();
 
-export default store;
+    return {
+        state,
+        subscribe,
+        changeCount
+    }
+};
+
+export default createStore();

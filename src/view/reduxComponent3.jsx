@@ -1,39 +1,55 @@
 import React, {Component} from 'react';
-import createStore from "../redux/demo02";
+import createStore from "../redux/demo03";
 let state = {
-    count: 1,
-    person: {
-        name: 'laowang',
-        sex: '男'
-    }
+    count: 0
 };
-let {getState, subscribe, changeCount} = createStore(state);
+let {getState, subscribe, changeCount} = createStore(plan, state);
+function plan(state, action) {
+    switch (action.type) {
+        case 'INCREASE':
+            return {
+                ...state,
+                count: state.count + 1
+            };
+        case 'SUBTRACT': {
+            return {
+                ...state,
+                count: state.count - 1
+            }
+        }
+        default:
+            return {
+                ...state
+            }
+    }
+}
 
+createStore(plan, state);
 class ReduxComponent1 extends Component {
     constructor(props) {
         super(props);
-        this.state = state;
+        this.state = getState()
     }
     render() {
         return (
             <div>
-                <button onClick={this.handleClick}>更新数据</button>
+                <button onClick={ReduxComponent1.handleClick.bind(this, 1)}>加1</button>
+                <button onClick={ReduxComponent1.handleClick.bind(this, 2)}>减1</button>
                 <h1>count:{this.state.count}</h1>
-
-                <h2>姓名：{this.state.person.name}，性别：{this.state.person.sex}</h2>
             </div>
         );
     }
-    handleClick= ()=> {
-        console.log(getState())
-        let state = Object.assign(getState(), {
-            count: 5,
-            person: {
-                name: 'xiaoming',
-                sex: '女'
-            }
-        });
-        changeCount(state);
+    static handleClick(type){
+        if(type === 1) {
+            changeCount({
+                type: 'INCREASE'
+            });
+        } else {
+            changeCount({
+                type: 'SUBTRACT'
+            });
+        }
+
     }
     // 在渲染前调用
     UNSAFE_componentWillMount() {
@@ -43,11 +59,11 @@ class ReduxComponent1 extends Component {
     // 可以通过this.getDOMNode()来进行访问。
     componentDidMount() {// 渲染完成
         subscribe(() => {
+            console.log(getState())
             this.setState({
-                state: getState()
+                count: getState().count
             })
         });
-
     }
     // 返回一个布尔值。在组件接收到新的props或者state时被调用。在初始化时或者使用forceUpdate时不被调用。
     shouldComponentUpdate(nextProps, nextState, nextContext) {
