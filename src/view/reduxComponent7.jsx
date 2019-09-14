@@ -1,32 +1,22 @@
 import React, {Component} from 'react';
-import createStore from "../redux/demo06";
-import combineReducers from '../redux/demo06/combine'
-import counterReducer from '../redux/demo06/countType'
-import personReducer from '../redux/demo06/personType'
+import {createStore, applyMiddleware} from "../redux/demo07";
+import combineReducers from '../redux/demo07/combine'
+import counterReducer from '../redux/demo07/countType'
+import personReducer from '../redux/demo07/personType'
 // 中间件
-import exceptionMiddleware from  '../redux/demo06/middleware/exceptionMiddleware'
-import loggerMiddleware from  '../redux/demo06/middleware/loggerMiddleware'
-import timeMiddleware from  '../redux/demo06/middleware/timeMiddleware'
+import {exceptionMiddleware, timeMiddleware, loggerMiddleware} from  '../redux/demo07/middleware'
+
 // 合并不同状态定义的操作类型
 const reducer = combineReducers({
     counter: counterReducer,
     person: personReducer
 });
-
-const store = createStore(reducer);
-const next = store.dispatch;
-
-// 日志输出中间件
-let logger = loggerMiddleware(store);
-// 异常处理中间件
-let exception = exceptionMiddleware(store);
-// 中间件扩展，在打印日志前输出当前时间戳
-let time = timeMiddleware(store)
-
-/*重写了store.dispatch*/
-// 处理异常并输出日志
-store.dispatch = exception(time(logger(next)));
-
+// 添加中间件重写Store, 最先执行的中间件写最前面
+const rewriteCreateStoreFunc = applyMiddleware(exceptionMiddleware, timeMiddleware, loggerMiddleware);
+// 有中间件
+const store = createStore(reducer, {}, rewriteCreateStoreFunc);
+// 无中间件
+// const store = createStore(reducer);
 class ReduxComponent1 extends Component {
     constructor(props) {
         super(props);
@@ -35,7 +25,7 @@ class ReduxComponent1 extends Component {
     render() {
         return (
             <div>
-                <h2>6、中间件封装</h2>
+                <h2>7、中间件优化</h2>
                 <button onClick={ReduxComponent1.handleClick.bind(this, 1)}>加1</button>
                 <button onClick={ReduxComponent1.handleClick.bind(this, 2)}>减1</button>
                 <h3>count:{this.state.counter.count}</h3>
