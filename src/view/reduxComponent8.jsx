@@ -1,38 +1,39 @@
 import React, {Component} from 'react';
-import createStore from "../redux/demo04";
-import combineReducers from '../redux/demo04/combine'
-import {counterReducer, personReducer} from '../redux/demo04/type'
-let state = {
-    counter: {
-        count: 0
-    },
+import {createStore, applyMiddleware} from "../redux/demo08";
+import combineReducers from '../redux/demo08/combine'
+import counterReducer from '../redux/demo08/countType'
+import personReducer from '../redux/demo08/personType'
+// 中间件
+import {exceptionMiddleware, timeMiddleware, loggerMiddleware} from  '../redux/demo07/middleware'
 
-    person: {
-        name: 'xiao ming',
-        age: 12
-    }
-};
 // 合并不同状态定义的操作类型
 const reducer = combineReducers({
     counter: counterReducer,
     person: personReducer
 });
-let {getState, subscribe, changeCount} = createStore(reducer, state);
-
-class ReduxComponent4 extends Component {
+// 添加中间件重写Store, 最先执行的中间件写最前面
+const rewriteCreateStoreFunc = applyMiddleware(exceptionMiddleware, timeMiddleware, loggerMiddleware);
+// 有中间件
+const store = createStore(reducer, {}, rewriteCreateStoreFunc);
+// 无中间件
+// const store = createStore(reducer);
+class ReduxComponent8 extends Component {
     constructor(props) {
         super(props);
-        this.state = getState()
+        this.state = store.getState();
+        this.unsubscribeFun = null;
     }
     render() {
         return (
             <div>
-                <h2>4、合并多个状态</h2>
+                <h2>8、退订</h2>
                 <button onClick={this.handleClick.bind(this, 1)}>加1</button>
                 <button onClick={this.handleClick.bind(this, 2)}>减1</button>
+                <button onClick={this.subscribe.bind(this)}>订阅</button>
+                <button onClick={this.unsubscribe.bind(this)}>退订</button>
                 <h3>count:{this.state.counter.count}</h3>
-                <input type="text" placeholder="请输入姓名" name="" id="" onInput={this.handleName}/>
-                <input type="number" placeholder="请输入年龄" name="" id="" onInput={this.handleAge}/>
+                <input type="text" placeholder="请输入姓名" defaultValue={this.state.person.name} id="" onInput={this.handleName}/>
+                <input type="number" placeholder="请输入年龄" defaultValue={this.state.person.age} id="" onInput={this.handleAge}/>
                 <ol>
                     <li>姓名：{this.state.person.name}</li>
                     <li>年龄: {this.state.person.age}</li>
@@ -40,43 +41,51 @@ class ReduxComponent4 extends Component {
             </div>
         );
     }
-    handleClick(type){
+    handleClick = type => {
         if(type === 1) {
-            changeCount({
+            store.dispatch({
                 type: 'INCREASE'
             });
         } else {
-            changeCount({
+            store.dispatch({
                 type: 'SUBTRACT'
             });
         }
 
-    }
+    };
     handleName = (e) => {
-        changeCount({
+        store.dispatch({
             type: 'SET_NAME',
             name: e.target.value
         });
     }
     handleAge = (e) => {
-        changeCount({
+        store.dispatch({
             type: 'SET_AGE',
             age: e.target.value
         });
     }
+    subscribe() {
+        this.unsubscribeFun = store.subscribe(() => {
+            this.setState({
+                ...store.getState()
+            })
+        });
+    }
+    unsubscribe() {
+        console.log(this.unsubscribeFun)
+        if(this.unsubscribeFun) {
+            this.unsubscribeFun()
+        }
+    }
     // 在渲染前调用
     UNSAFE_componentWillMount() {
-
+        this.subscribe()
     }
     // 在第一次渲染后调用，只在客户端。 之后组件已经生成了对应的DOM结构，
     // 可以通过this.getDOMNode()来进行访问。
     componentDidMount() {// 渲染完成
-        subscribe(() => {
-            console.log(getState())
-            this.setState({
-                ...getState()
-            })
-        });
+
     }
     // 返回一个布尔值。在组件接收到新的props或者state时被调用。在初始化时或者使用forceUpdate时不被调用。
     shouldComponentUpdate(nextProps, nextState, nextContext) {
@@ -101,4 +110,4 @@ class ReduxComponent4 extends Component {
 
 }
 
-export default ReduxComponent4;
+export default ReduxComponent8;

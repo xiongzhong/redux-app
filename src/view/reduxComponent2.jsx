@@ -9,7 +9,7 @@ let state = {
 };
 let {getState, subscribe, changeCount} = createStore(state);
 
-class ReduxComponent1 extends Component {
+class ReduxComponent2 extends Component {
     constructor(props) {
         super(props);
         this.state = state;
@@ -73,4 +73,4 @@ class ReduxComponent1 extends Component {
 
 }
 
-export default ReduxComponent1;
+export default ReduxComponent2;

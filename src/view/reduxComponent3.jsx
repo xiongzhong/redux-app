@@ -25,7 +25,7 @@ function plan(state, action) {
 }
 
 createStore(plan, state);
-class ReduxComponent1 extends Component {
+class ReduxComponent3 extends Component {
     constructor(props) {
         super(props);
         this.state = getState()
@@ -34,14 +34,14 @@ class ReduxComponent1 extends Component {
         return (
             <div>
                 <h2>3、通过指定类型更新状态，防止非法更新状态</h2>
-                <button onClick={ReduxComponent1.handleClick.bind(this, 1)}>加1</button>
-                <button onClick={ReduxComponent1.handleClick.bind(this, 2)}>减1</button>
-                <button onClick={ReduxComponent1.handleClick.bind(this, 3)}>将count该为abc</button>
+                <button onClick={this.handleClick.bind(this, 1)}>加1</button>
+                <button onClick={this.handleClick.bind(this, 2)}>减1</button>
+                <button onClick={this.handleClick.bind(this, 3)}>将count该为abc</button>
                 <h3>count:{this.state.count}</h3>
             </div>
         );
     }
-    static handleClick(type){
+    handleClick = type => {
         if(type === 1) {
             changeCount({
                 type: 'INCREASE'
@@ -56,7 +56,7 @@ class ReduxComponent1 extends Component {
             });
         }
 
-    }
+    };
     // 在渲染前调用
     UNSAFE_componentWillMount() {
 
@@ -94,4 +94,4 @@ class ReduxComponent1 extends Component {
 
 }
 
-export default ReduxComponent1;
+export default ReduxComponent3;

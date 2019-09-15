@@ -17,7 +17,7 @@ const rewriteCreateStoreFunc = applyMiddleware(exceptionMiddleware, timeMiddlewa
 const store = createStore(reducer, {}, rewriteCreateStoreFunc);
 // 无中间件
 // const store = createStore(reducer);
-class ReduxComponent1 extends Component {
+class ReduxComponent7 extends Component {
     constructor(props) {
         super(props);
         this.state = store.getState()
@@ -26,8 +26,8 @@ class ReduxComponent1 extends Component {
         return (
             <div>
                 <h2>7、中间件优化</h2>
-                <button onClick={ReduxComponent1.handleClick.bind(this, 1)}>加1</button>
-                <button onClick={ReduxComponent1.handleClick.bind(this, 2)}>减1</button>
+                <button onClick={this.handleClick.bind(this, 1)}>加1</button>
+                <button onClick={this.handleClick.bind(this, 2)}>减1</button>
                 <h3>count:{this.state.counter.count}</h3>
                 <input type="text" placeholder="请输入姓名" defaultValue={this.state.person.name} id="" onInput={this.handleName}/>
                 <input type="number" placeholder="请输入年龄" defaultValue={this.state.person.age} id="" onInput={this.handleAge}/>
@@ -38,7 +38,7 @@ class ReduxComponent1 extends Component {
             </div>
         );
     }
-    static handleClick(type){
+    handleClick = type => {
         if(type === 1) {
             store.dispatch({
                 type: 'INCREASE'
@@ -49,7 +49,7 @@ class ReduxComponent1 extends Component {
             });
         }
 
-    }
+    };
     handleName = (e) => {
         store.dispatch({
             type: 'SET_NAME',
@@ -98,4 +98,4 @@ class ReduxComponent1 extends Component {
 
 }
 
-export default ReduxComponent1;
+export default ReduxComponent7;
