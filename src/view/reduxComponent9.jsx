@@ -1,23 +1,23 @@
 import React, {Component} from 'react';
-import {createStore, applyMiddleware} from "../redux/demo08";
-import combineReducers from '../redux/demo08/combine'
-import counterReducer from '../redux/demo08/countType'
-import personReducer from '../redux/demo08/personType'
+import {createStore, applyMiddleware} from "../redux/demo09";
+import combineReducers from '../redux/demo09/combine'
+import counterReducer from '../redux/demo09/countType'
+import personReducer from '../redux/demo09/personType'
 // 中间件
-import {exceptionMiddleware, timeMiddleware, loggerMiddleware} from  '../redux/demo08/middleware'
+import {exceptionMiddleware, timeMiddleware, loggerMiddleware} from  '../redux/demo09/middleware'
 
 // 合并不同状态定义的操作类型
 const reducer = combineReducers({
     counter: counterReducer,
-    person: personReducer
+    // person: personReducer
 });
 // 添加中间件重写Store, 最先执行的中间件写最前面
 const rewriteCreateStoreFunc = applyMiddleware(exceptionMiddleware, timeMiddleware, loggerMiddleware);
 // 有中间件
-const store = createStore(reducer, {}, rewriteCreateStoreFunc);
-// 无中间件
-// const store = createStore(reducer);
-class ReduxComponent8 extends Component {
+const store = createStore(reducer, rewriteCreateStoreFunc);
+
+
+class ReduxComponent9 extends Component {
     constructor(props) {
         super(props);
         this.state = store.getState();
@@ -26,18 +26,28 @@ class ReduxComponent8 extends Component {
     render() {
         return (
             <div>
-                <h2>8、退订</h2>
+                <h2>9、退订</h2>
                 <button onClick={this.handleClick.bind(this, 1)}>加1</button>
                 <button onClick={this.handleClick.bind(this, 2)}>减1</button>
                 <button onClick={this.subscribe.bind(this)}>订阅</button>
                 <button onClick={this.unsubscribe.bind(this)}>退订</button>
+                <button onClick={this.addReducer.bind(this)}>新增reducer</button>
                 <h3>count:{this.state.counter.count}</h3>
-                <input type="text" placeholder="请输入姓名" defaultValue={this.state.person.name} id="" onInput={this.handleName}/>
-                <input type="number" placeholder="请输入年龄" defaultValue={this.state.person.age} id="" onInput={this.handleAge}/>
-                <ol>
-                    <li>姓名：{this.state.person.name}</li>
-                    <li>年龄: {this.state.person.age}</li>
-                </ol>
+                {
+                    ((person) => {
+                        if(person) {
+                            return (<div>
+                                <input type="text" placeholder="请输入姓名" defaultValue={this.state.person.name} id="" onInput={this.handleName}/>
+                                <input type="number" placeholder="请输入年龄" defaultValue={this.state.person.age} id="" onInput={this.handleAge}/>
+                                <ol>
+                                    <li>姓名：{this.state.person.name}</li>
+                                    <li>年龄: {this.state.person.age}</li>
+                                </ol>
+                            </div>)
+                        }
+                    })(this.state.person)
+                }
+
             </div>
         );
     }
@@ -78,6 +88,14 @@ class ReduxComponent8 extends Component {
             this.unsubscribeFun()
         }
     }
+    addReducer() {
+        /*生成新的reducer*/
+        const nextReducer = combineReducers({
+            counter: counterReducer,
+            person: personReducer
+        });
+        store.replaceReducer(nextReducer);
+    }
     // 在渲染前调用
     UNSAFE_componentWillMount() {
         this.subscribe()
@@ -110,4 +128,4 @@ class ReduxComponent8 extends Component {
 
 }
 
-export default ReduxComponent8;
+export default ReduxComponent9;

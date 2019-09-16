@@ -8,6 +8,7 @@ import ReduxComponent5 from './view/reduxComponent5'
 import ReduxComponent6 from './view/reduxComponent6'
 import ReduxComponent7 from './view/reduxComponent7'
 import ReduxComponent8 from './view/reduxComponent8'
+import ReduxComponent9 from './view/reduxComponent9'
 class App extends Component {
     render() {
         return (
@@ -28,6 +29,8 @@ class App extends Component {
                 <ReduxComponent7/>
                 <hr/>
                 <ReduxComponent8/>
+                <hr/>
+                <ReduxComponent9/>
             </div>
         )
     }
