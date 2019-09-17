@@ -1,37 +1,86 @@
 import React, {Component} from 'react';
-import {createStore, applyMiddleware} from "../redux/demo09";
-import combineReducers from '../redux/demo09/combine'
-import counterReducer from '../redux/demo09/countType'
-import personReducer from '../redux/demo09/personType'
+import {createStore, applyMiddleware} from "../redux/demo10";
+import combineReducers from '../redux/demo10/combine'
+import counterReducer from '../redux/demo10/countType'
+import personReducer from '../redux/demo10/personType'
 // 中间件
-import {exceptionMiddleware, timeMiddleware, loggerMiddleware} from  '../redux/demo09/middleware'
+import {exceptionMiddleware, timeMiddleware, loggerMiddleware} from  '../redux/demo10/middleware'
 
 // 合并不同状态定义的操作类型
 const reducer = combineReducers({
     counter: counterReducer,
-    // person: personReducer
+    person: personReducer
 });
 // 添加中间件重写Store, 最先执行的中间件写最前面
 const rewriteCreateStoreFunc = applyMiddleware(exceptionMiddleware, timeMiddleware, loggerMiddleware);
 // 有中间件
 const store = createStore(reducer, rewriteCreateStoreFunc);
 
+/*返回 action 的函数就叫 actionCreator*/
+function increment() {
+    return {
+        type: 'INCREASE'
+    }
+}
+function subtract() {
+    return {
+        type: 'SUBTRACT'
+    }
+}
+/*返回 action 的函数就叫 actionCreator*/
+function setName(name) {
+    return {
+        type: 'SET_NAME',
+        name: name
+    }
+}
+function setAge(age) {
+    return {
+        type: 'SET_AGE',
+        age: age
+    }
+}
+/*核心的代码在这里，通过闭包隐藏了 actionCreator 和 dispatch*/
+function bindActionCreator(actionCreator, dispatch) {
+    return function () {
+        return dispatch(actionCreator.apply(this, arguments))
+    }
+}
+function bindActionCreators(actionCreators, dispatch) {
+    if(typeof actionCreators === 'function') {
+        return bindActionCreator(actionCreators, dispatch)
+    }
+    try {
+        if(typeof actionCreators === 'object' && Object.keys(actionCreators).length !== 0) {
+            let keys =  Object.keys(actionCreators);
+            let boundActionCreators = {};
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
+                boundActionCreators[key] = bindActionCreator(actionCreators[key], dispatch)
+            }
+            return boundActionCreators
+        }
+    } catch (e) {
+        throw e
+    }
+}
+const actions = bindActionCreators({ increment, subtract, setName, setAge}, store.dispatch);
 
-class ReduxComponent9 extends Component {
+class ReduxComponent10 extends Component {
     constructor(props) {
         super(props);
         this.state = store.getState();
         this.unsubscribeFun = null;
+        console.log(this.state)
     }
     render() {
         return (
             <div>
-                <h2>9、compose</h2>
+                <h2>10、bindActionCreators </h2>
                 <button onClick={this.handleClick.bind(this, 1)}>加1</button>
                 <button onClick={this.handleClick.bind(this, 2)}>减1</button>
                 <button onClick={this.subscribe.bind(this)}>订阅</button>
                 <button onClick={this.unsubscribe.bind(this)}>退订</button>
-                <button onClick={this.addReducer.bind(this)}>新增reducer</button>
                 <h3>count:{this.state.counter.count}</h3>
                 {
                     ((person) => {
@@ -53,27 +102,33 @@ class ReduxComponent9 extends Component {
     }
     handleClick = type => {
         if(type === 1) {
-            store.dispatch({
-                type: 'INCREASE'
-            });
+            console.log(actions)
+            actions.increment()
+            // store.dispatch({
+            //     type: 'INCREASE'
+            // });
         } else {
-            store.dispatch({
+            /*store.dispatch({
                 type: 'SUBTRACT'
-            });
+            });*/
+
+            actions.subtract()
         }
 
     };
     handleName = (e) => {
-        store.dispatch({
-            type: 'SET_NAME',
-            name: e.target.value
-        });
+        // store.dispatch({
+        //     type: 'SET_NAME',
+        //     name: e.target.value
+        // });
+        actions.setName(e.target.value)
     }
     handleAge = (e) => {
-        store.dispatch({
-            type: 'SET_AGE',
-            age: e.target.value
-        });
+        // store.dispatch({
+        //     type: 'SET_AGE',
+        //     age: e.target.value
+        // });
+        actions.setAge(e.target.value)
     }
     subscribe() {
         this.unsubscribeFun = store.subscribe(() => {
@@ -87,14 +142,6 @@ class ReduxComponent9 extends Component {
         if(this.unsubscribeFun) {
             this.unsubscribeFun()
         }
-    }
-    addReducer() {
-        /*生成新的reducer*/
-        const nextReducer = combineReducers({
-            counter: counterReducer,
-            person: personReducer
-        });
-        store.replaceReducer(nextReducer);
     }
     // 在渲染前调用
     UNSAFE_componentWillMount() {
@@ -128,4 +175,4 @@ class ReduxComponent9 extends Component {
 
 }
 
-export default ReduxComponent9;
+export default ReduxComponent10;
