@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {createStore, applyMiddleware, combineReducers} from "../redux/demo10";
+import {createStore, applyMiddleware, combineReducers, bindActionCreators} from "../redux/demo10";
 import counterReducer from '../redux/demo10/countType'
 import personReducer from '../redux/demo10/personType'
 // 中间件
@@ -39,30 +39,7 @@ function setAge(age) {
         age: age
     }
 }
-/*核心的代码在这里，通过闭包隐藏了 actionCreator 和 dispatch*/
-function bindActionCreator(actionCreator, dispatch) {
-    return function () {
-        return dispatch(actionCreator.apply(this, arguments))
-    }
-}
-function bindActionCreators(actionCreators, dispatch) {
-    if(typeof actionCreators === 'function') {
-        return bindActionCreator(actionCreators, dispatch)
-    }
-    try {
-        if(typeof actionCreators === 'object' && Object.keys(actionCreators).length !== 0) {
-            let keys =  Object.keys(actionCreators);
-            let boundActionCreators = {};
-            for (let i = 0; i < keys.length; i++) {
-                let key = keys[i];
-                boundActionCreators[key] = bindActionCreator(actionCreators[key], dispatch)
-            }
-            return boundActionCreators
-        }
-    } catch (e) {
-        throw e
-    }
-}
+
 const actions = bindActionCreators({ increment, subtract, setName, setAge}, store.dispatch);
 
 class ReduxComponent10 extends Component {

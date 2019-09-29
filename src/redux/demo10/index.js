@@ -112,8 +112,34 @@ function combineReducers(reducers) {
         return initState;
     }
 }
+/*核心的代码在这里，通过闭包隐藏了 actionCreator 和 dispatch*/
+function bindActionCreator(actionCreator, dispatch) {
+    return function () {
+        return dispatch(actionCreator.apply(this, arguments))
+    }
+}
+function bindActionCreators(actionCreators, dispatch) {
+    if(typeof actionCreators === 'function') {
+        return bindActionCreator(actionCreators, dispatch)
+    }
+    try {
+        if(typeof actionCreators === 'object' && Object.keys(actionCreators).length !== 0) {
+            let keys =  Object.keys(actionCreators);
+            let boundActionCreators = {};
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
+                boundActionCreators[key] = bindActionCreator(actionCreators[key], dispatch)
+            }
+            return boundActionCreators
+        }
+    } catch (e) {
+        throw e
+    }
+}
 export {
+    compose,
     createStore,
     applyMiddleware,
-    combineReducers
+    combineReducers,
+    bindActionCreators
 }
