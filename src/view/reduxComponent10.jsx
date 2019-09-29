@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import {createStore, applyMiddleware} from "../redux/demo10";
-import combineReducers from '../redux/demo10/combine'
+import {createStore, applyMiddleware, combineReducers} from "../redux/demo10";
 import counterReducer from '../redux/demo10/countType'
 import personReducer from '../redux/demo10/personType'
 // 中间件
